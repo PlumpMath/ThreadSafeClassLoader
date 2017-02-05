@@ -21,7 +21,7 @@ public class ThreadSafeNumberSequenceGenerator implements Function<NumberSequenc
         .argumentTypes(int.class)
     );
     for (int i = 0; i < settings.getSequenceSize(); i++)
-      numberSequence[i] = numberGenerator.addAndGet(new Integer(settings.getStepSize()));
+      numberSequence[i] = numberGenerator.addAndGet(settings.getStepSize());
     return numberSequence;
   }
 }

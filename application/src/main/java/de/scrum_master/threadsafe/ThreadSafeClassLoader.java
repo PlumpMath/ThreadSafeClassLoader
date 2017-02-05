@@ -23,11 +23,8 @@ public class ThreadSafeClassLoader extends JarClassLoader {
   private ThreadSafeClassLoader(Class... classes) {
     super();
     this.classes.addAll(Arrays.asList(classes));
-    for (Class clazz : classes) {
-      URL location = clazz.getProtectionDomain().getCodeSource().getLocation();
-      System.out.println(location);
-      add(location);
-    }
+    for (Class clazz : classes)
+      add(clazz.getProtectionDomain().getCodeSource().getLocation());
   }
 
   public Object newObject(Class clazz, Class[] argumentTypes, Object... arguments) {

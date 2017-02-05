@@ -12,8 +12,7 @@ public class ThreadSafeNumberSequenceGenerator implements Function<NumberSequenc
 
   @Override
   public int[] apply(NumberSequenceSettings settings) {
-    System.out.println(Thread.currentThread());
-    ThreadSafeClassLoader classLoader = ThreadSafeNumberSequenceGenerator.threadSafeClassLoader.get();
+    ThreadSafeClassLoader classLoader = threadSafeClassLoader.get();
     int[] numberSequence = new int[settings.getSequenceSize()];
 
     Object numberGenerator = classLoader.newObject(

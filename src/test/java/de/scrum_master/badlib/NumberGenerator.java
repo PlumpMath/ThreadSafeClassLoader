@@ -8,7 +8,6 @@ public class NumberGenerator {
   // public NumberGenerator() {}
 
   public NumberGenerator(int initialValue) {
-    System.out.println("NumberGenerator(" + initialValue + ")");
     currentNumber = initialValue;
   }
 

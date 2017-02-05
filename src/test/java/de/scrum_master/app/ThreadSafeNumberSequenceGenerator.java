@@ -1,11 +1,11 @@
 package de.scrum_master.app;
 
 import de.scrum_master.badlib.NumberGenerator;
-import de.scrum_master.threadsafe.ThreadSafeClassLoader;
+import de.scrum_master.thread_safe.ThreadSafeClassLoader;
 
 import java.util.function.Function;
 
-import static de.scrum_master.threadsafe.ThreadSafeClassLoader.ObjectConstructionRules.forTargetType;
+import static de.scrum_master.thread_safe.ThreadSafeClassLoader.ObjectConstructionRules.forTargetType;
 
 public class ThreadSafeNumberSequenceGenerator implements Function<NumberSequenceSettings, int[]> {
   private static ThreadLocal<ThreadSafeClassLoader> threadSafeClassLoader =

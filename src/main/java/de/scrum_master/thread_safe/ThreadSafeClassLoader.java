@@ -1,4 +1,4 @@
-package de.scrum_master.threadsafe;
+package de.scrum_master.thread_safe;
 
 import org.xeustechnologies.jcl.JarClassLoader;
 import org.xeustechnologies.jcl.JclObjectFactory;

@@ -1,5 +1,8 @@
-package de.scrum_master.app
+package de.scrum_master.thread_safe
 
+import de.scrum_master.app.NonThreadSafeNumberSequenceGenerator
+import de.scrum_master.app.NumberSequenceSettings
+import de.scrum_master.app.ThreadSafeNumberSequenceGenerator
 import org.spockframework.runtime.ConditionNotSatisfiedError
 import spock.lang.FailsWith
 import spock.lang.Specification

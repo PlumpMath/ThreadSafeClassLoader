@@ -6,7 +6,6 @@
 
   <groupId>de.scrum-master.stackoverflow</groupId>
   <artifactId>multiple-classloaders-for-non-threadsafe-library</artifactId>
-  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
   <prerequisites>
@@ -275,7 +274,6 @@
       <plugin>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-eclipse-compiler</artifactId>
-        <!--<extensions>true</extensions>-->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -298,6 +296,23 @@
 
   <dependencyManagement>
     <dependencies>
+      <!--========== Compile dependencies ==========-->
+
+      <!-- Classloader isolation -->
+      <dependency>
+        <groupId>org.xeustechnologies</groupId>
+        <artifactId>jcl-core</artifactId>
+        <version>2.8</version>
+      </dependency>
+      <!-- Dynamic proxy creation in JCL + in Spock -->
+      <dependency>
+        <groupId>cglib</groupId>
+        <artifactId>cglib-nodep</artifactId>
+        <version>3.2.4</version>
+      </dependency>
+
+      <!--========== Test dependencies ==========-->
+
       <!-- JUnit -->
       <dependency>
         <groupId>junit</groupId>
@@ -318,13 +333,6 @@
         <version>${version.spock}</version>
         <scope>test</scope>
       </dependency>
-      <!-- Mock classes (in addition to interfaces) in Spock -->
-      <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib-nodep</artifactId>
-        <version>3.2.4</version>
-        <scope>test</scope>
-      </dependency>
       <!-- Mock final classes and classes without default constructors in Spock -->
       <dependency>
         <groupId>org.objenesis</groupId>
@@ -332,39 +340,48 @@
         <version>2.2</version>
         <scope>test</scope>
       </dependency>
+      <!-- Avoid "SLF4J: Failed to load class org.slf4j.impl.StaticLoggerBinder" when using JCL -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-nop</artifactId>
+        <version>1.7.21</version>
+        <scope>test</scope>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-    <!-- JUnit -->
+    <!--========== Compile dependencies ==========-->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>org.xeustechnologies</groupId>
+      <artifactId>jcl-core</artifactId>
     </dependency>
-    <!-- Spock framework for unit and integration tests -->
-    <dependency>
-      <groupId>org.spockframework</groupId>
-      <artifactId>spock-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Spock needs Groovy -->
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Spock needs CGLIB for class mocking (interface mocking works out of the box) -->
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib-nodep</artifactId>
-      <scope>test</scope>
     </dependency>
-    <!-- Spock needs objenesis for (final) class mocking without default constructors -->
+
+    <!--========== Test dependencies ==========-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.spockframework</groupId>
+      <artifactId>spock-core</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.objenesis</groupId>
       <artifactId>objenesis</artifactId>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
     </dependency>
   </dependencies>
 
@@ -390,9 +407,5 @@
     </profile>
   </profiles>
 
-  <modules>
-    <module>bad-library</module>
-    <module>application</module>
-  </modules>
 
 </project>

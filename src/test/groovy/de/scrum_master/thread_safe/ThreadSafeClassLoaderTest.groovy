@@ -3,11 +3,12 @@ package de.scrum_master.thread_safe
 import de.scrum_master.app.NonThreadSafeNumberSequenceGenerator
 import de.scrum_master.app.NumberSequenceSettings
 import de.scrum_master.app.ThreadSafeNumberSequenceGenerator
+import de.scrum_master.badlib.NumberGenerator
 import org.spockframework.runtime.ConditionNotSatisfiedError
 import spock.lang.FailsWith
 import spock.lang.Specification
 
-class NumberSequenceGeneratorTest extends Specification {
+class ThreadSafeClassLoaderTest extends Specification {
   def settingsList = [
     new NumberSequenceSettings(1, 1, 10),
     new NumberSequenceSettings(0, 3, 11),
@@ -15,9 +16,9 @@ class NumberSequenceGeneratorTest extends Specification {
     new NumberSequenceSettings(1, 2, 3),
     new NumberSequenceSettings(4, 5, 6),
   ]
-  def sequenceElementsTotal = 10 + 11 + 4 + 3 + 6
-  def sequenceElementsMax = [10, 11, 4, 3, 6].max()
-  def callDuration = 50
+  def sequenceElementsTotal = settingsList.sum { it.sequenceSize }
+  def sequenceElementsMax = settingsList.max { it.sequenceSize }.sequenceSize
+  def callDuration = NumberGenerator.SLEEP_MILLIS
   def startTime = System.currentTimeMillis()
 
   def "Use non-thread-safe number sequence generator in a sequential stream"() {
@@ -82,26 +83,16 @@ class NumberSequenceGeneratorTest extends Specification {
   }
 
   private void checkResults(int[][] results) {
-    assert results.length == 5
-
-    assert results[0].length == 10
-    assert results[0][0] == 1
-    assert results[0][9] == 10
-
-    assert results[1].length == 11
-    assert results[1][0] == 0
-    assert results[1][10] == 30
-
-    assert results[2].length == 4
-    assert results[2][0] == 22
-    assert results[2][3] == 25
-
-    assert results[3].length == 3
-    assert results[3][0] == 1
-    assert results[3][2] == 5
-
-    assert results[4].length == 6
-    assert results[4][0] == 4
-    assert results[4][5] == 29
+    assert results.length == settingsList.size()
+    (0..results.length - 1).each {
+      def settings = settingsList[it]
+      def result = results[it]
+      // Note: This works parallel streams because lists and arrays are intrinsically ordered stream sources,
+      // thus mapping their elements to other types keeps the order. See also:
+      // https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html#Ordering
+      assert result.length == settings.sequenceSize
+      assert result[0] == settings.startValue
+      assert result[result.length - 1] == settings.startValue + settings.stepSize * (settings.sequenceSize - 1)
+    }
   }
 }

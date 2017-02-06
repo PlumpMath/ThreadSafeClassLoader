@@ -324,8 +324,8 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <scope>test</scope>
         <version>${version.groovy}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.spockframework</groupId>

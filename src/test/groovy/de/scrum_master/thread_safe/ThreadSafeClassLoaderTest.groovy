@@ -3,143 +3,66 @@ package de.scrum_master.thread_safe
 import de.scrum_master.app.INumberGenerator
 import de.scrum_master.badlib.NumberGenerator
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static de.scrum_master.thread_safe.ThreadSafeClassLoader.ObjectConstructionRules.forTargetType
 
 class ThreadSafeClassLoaderTest extends Specification {
-  def "Use constructor + arguments + interface"() {
-    given:
-    def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
 
-    when:
-    INumberGenerator numberGenerator = threadSafeClassLoader.get().newObject(
-      forTargetType(INumberGenerator)
-      .implementingType(NumberGenerator)
-      .arguments("3")
-    )
+  def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
 
-    then:
-    numberGenerator.addAndGet(11) == 14
-    numberGenerator.addAndGet(9) == 23
-
-    cleanup:
+  def cleanup() {
     threadSafeClassLoader.remove()
   }
 
-  def "Use constructor + arguments + types + interface"() {
+  @Unroll
+  def "Create #hasIface type via #hasFactory (#hasArgs, #hasTypes) "() {
     given:
-    def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
+    def constructionRules = forTargetType(targetType)
+    if (hasIface)
+      constructionRules.implementingType(NumberGenerator)
+    if (arguments)
+      constructionRules.arguments(arguments)
+    if (argumentTypes)
+      constructionRules.argumentTypes(argumentTypes)
+    if (factoryMethod)
+      constructionRules.factoryMethod(factoryMethod)
 
     when:
-    INumberGenerator numberGenerator = threadSafeClassLoader.get().newObject(
-      forTargetType(INumberGenerator)
-      .implementingType(NumberGenerator)
-      .arguments(3)
-      .argumentTypes(int.class)
-    )
+    def numberGenerator = threadSafeClassLoader.get().newObject(constructionRules)
 
     then:
-    numberGenerator.addAndGet(11) == 14
-    numberGenerator.addAndGet(9) == 23
+    numberGenerator.addAndGet(11) == result1
+    numberGenerator.addAndGet(9) == result2
 
-    cleanup:
-    threadSafeClassLoader.remove()
+    where:
+    targetType       | arguments | argumentTypes | factoryMethod | result1 | result2
+    NumberGenerator  | null      | null          | null          | 11      | 20
+    NumberGenerator  | "3"       | null          | null          | 14      | 23
+    NumberGenerator  | 3         | int           | null          | 14      | 23
+    NumberGenerator  | null      | null          | "create"      | 11      | 20
+    NumberGenerator  | 3         | null          | "create"      | 14      | 23
+    NumberGenerator  | 3         | Integer       | "create"      | 14      | 23
+    INumberGenerator | null      | null          | null          | 11      | 20
+    INumberGenerator | "3"       | null          | null          | 14      | 23
+    INumberGenerator | 3         | int           | null          | 14      | 23
+    INumberGenerator | null      | null          | "create"      | 11      | 20
+    INumberGenerator | 3         | null          | "create"      | 14      | 23
+    INumberGenerator | 3         | Integer       | "create"      | 14      | 23
+
+    hasIface = targetType.isInterface() ? "interface" : "class"
+    hasArgs = arguments ? "arguments" : "no arguments"
+    hasTypes = argumentTypes ? "types" : "no types"
+    hasFactory = factoryMethod ? "factory method" : "constructor"
   }
 
-  def "Use factory method + arguments + no interface"() {
-    given:
-    def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
-
+  def "Try to create illegal target type object"() {
     when:
-    NumberGenerator numberGenerator = threadSafeClassLoader.get().newObject(
-      forTargetType(NumberGenerator)
-        .factoryMethod("create")
-        .arguments(3)
-    )
-
-    then:
-    numberGenerator.addAndGet(11) == 14
-    numberGenerator.addAndGet(3) == 17
-
-    cleanup:
-    threadSafeClassLoader.remove()
-  }
-
-  def "Use factory method + arguments + types + no interface"() {
-    given:
-    def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
-
-    when:
-    NumberGenerator numberGenerator = threadSafeClassLoader.get().newObject(
-      forTargetType(NumberGenerator)
-        .factoryMethod("create")
-        .arguments(3)
-        .argumentTypes(Integer)
-    )
-
-    then:
-    numberGenerator.addAndGet(11) == 14
-    numberGenerator.addAndGet(3) == 17
-
-    cleanup:
-    threadSafeClassLoader.remove()
-  }
-
-  def "Use factory method + arguments + types + interface"() {
-    given:
-    def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
-
-    when:
-    INumberGenerator numberGenerator = threadSafeClassLoader.get().newObject(
-      forTargetType(INumberGenerator)
-        .implementingType(NumberGenerator)
-        .factoryMethod("create")
-        .arguments(3)
-        .argumentTypes(Integer.class)
-    )
-
-    then:
-    numberGenerator.addAndGet(11) == 14
-    numberGenerator.addAndGet(3) == 17
-
-    cleanup:
-    threadSafeClassLoader.remove()
-  }
-
-  def "Use factory method + no arguments + interface"() {
-    given:
-    def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
-
-    when:
-    INumberGenerator numberGenerator = threadSafeClassLoader.get().newObject(
-      forTargetType(INumberGenerator)
-        .implementingType(NumberGenerator)
-        .factoryMethod("create")
-    )
-
-    then:
-    numberGenerator.addAndGet(11) == 11
-    numberGenerator.addAndGet(3) == 14
-
-    cleanup:
-    threadSafeClassLoader.remove()
-  }
-
-  def "Use illegal target type"() {
-    given:
-    def threadSafeClassLoader = ThreadSafeClassLoader.create(NumberGenerator)
-
-    when:
-    def dummy = threadSafeClassLoader.get().newObject(
-      forTargetType(String)
-    )
+    def dummy = threadSafeClassLoader.get().newObject(forTargetType(String))
 
     then:
     def error = thrown IllegalArgumentException
     error.message =~ /Class java.lang.String is not protected/
     dummy == null
-
-    cleanup:
-    threadSafeClassLoader.remove()
   }
 }

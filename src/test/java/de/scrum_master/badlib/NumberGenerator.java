@@ -10,6 +10,10 @@ public class NumberGenerator {
     currentNumber = initialValue;
   }
 
+  public NumberGenerator(String initialValue) {
+    this(Integer.parseInt(initialValue));
+  }
+
   public int addAndGet(int summand) {
     currentNumber += summand;
     try {

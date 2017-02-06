@@ -1,18 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>9</version>
+  </parent>
 
   <groupId>de.scrum-master</groupId>
   <artifactId>threadsafe-classloader</artifactId>
   <version>1.0-SNAPSHOT</version>
+
+  <name>ThreadSafeClassLoader</name>
+  <description>
+    Wrap thread-unsafe classes/libraries into thread-local, isolating classloader
+    in order to be able to use them concurrently
+  </description>
+  <url>https://github.com/kriegaex/ThreadSafeClassLoader</url>
+
+  <licenses>
+    <license>
+      <name>GNU General Public License (GPL) version 3.0</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Alexander Kriegisch</name>
+      <organization>Scrum-Master.de</organization>
+      <organizationUrl>http://scrum-master.de</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/kriegaex/ThreadSafeClassLoader</url>
+    <connection>scm:git:https://github.com/kriegaex/ThreadSafeClassLoader.git</connection>
+    <developerConnection>scm:git:https://github.com/kriegaex/ThreadSafeClassLoader.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
   <prerequisites>
     <maven>3.1.0</maven>
   </prerequisites>
 
   <properties>
+    <!-- If you want to build from an IDE like IDEA or Eclipse and use GnuPG version >= v2.0,
+    set the parameter to true in order to get a nice GUI dialog for entering the passphrase.
+    If you want to build from a console, set it to false or override it via -DgpgGuiPassphrase=false. -->
+    <gpgGuiPassphrase>true</gpgGuiPassphrase>
+
+    <!-- If you have multiple GnuPG signing keys on your keyring, the first one is used as the default key.
+    In order to use another one, specify the desired key ID here, otherwise you may just leave the parameter
+    empty or override it via -DgpgKeyId=. It does not hurt to always specify it, though. -->
+    <gpgKeyId>70CC1444</gpgKeyId>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -250,6 +294,12 @@
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.6</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.0.1</version>
           <configuration>
@@ -261,6 +311,81 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
+          <executions>
+            <execution>
+              <id>package-tests</id>
+              <phase>package</phase>
+              <goals>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.6</version>
+          <configuration>
+            <useAgent>${gpgGuiPassphrase}</useAgent>
+            <keyname>${gpgKeyId}</keyname>
+            <executable>c:\Program Files (x86)\GNU\GnuPG\gpg2.exe</executable>
+          </configuration>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.0.1</version>
+          <executions>
+            <execution>
+              <id>package-sources</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jar-no-fork</goal>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.10.4</version>
+          <executions>
+            <execution>
+              <id>package-javadocs</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jar</goal>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.4.1</version>
         </plugin>
 
       </plugins>
@@ -291,7 +416,31 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
-    </plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+      </plugin>
+  </plugins>
   </build>
 
   <dependencyManagement>
@@ -383,6 +532,12 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
     </dependency>
+<!--
+    <dependency>
+      <groupId>org.verapdf</groupId>
+      <artifactId>validation-model</artifactId>
+    </dependency>
+-->
   </dependencies>
 
   <profiles>

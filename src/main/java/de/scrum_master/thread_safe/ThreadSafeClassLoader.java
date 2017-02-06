@@ -96,7 +96,7 @@ public class ThreadSafeClassLoader extends JarClassLoader {
         implementingType = targetType;
       if (!classes.contains(implementingType))
         throw new IllegalArgumentException(
-          "Class " + implementingType + " is not protected by this thread-safe classloader"
+          "Class " + implementingType.getName() + " is not protected by this thread-safe classloader"
         );
     }
   }

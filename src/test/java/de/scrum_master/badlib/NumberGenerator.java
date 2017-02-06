@@ -4,9 +4,7 @@ public class NumberGenerator {
   public static final int SLEEP_MILLIS = 50;
   private static int currentNumber;
 
-  // JclUtils.cast would work without interface INumberGenerator in ThreadSafeNumberSequenceGenerator.apply
-  // if this class had a no-argument constructor
-  // public NumberGenerator() {}
+  public NumberGenerator() {}
 
   public NumberGenerator(int initialValue) {
     currentNumber = initialValue;
@@ -24,5 +22,9 @@ public class NumberGenerator {
 
   public static NumberGenerator create(Integer initialValue) {
     return new NumberGenerator(initialValue);
+  }
+
+  public static NumberGenerator create() {
+    return new NumberGenerator();
   }
 }

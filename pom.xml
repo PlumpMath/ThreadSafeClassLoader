@@ -496,6 +496,19 @@
         <version>1.7.21</version>
         <scope>test</scope>
       </dependency>
+      <!-- veraPDF is not thread-safe, thus a good object for integration tests -->
+      <dependency>
+        <groupId>org.verapdf</groupId>
+        <artifactId>core</artifactId>
+        <version>1.1.5</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.verapdf</groupId>
+        <artifactId>validation-model</artifactId>
+        <version>1.1.6</version>
+        <scope>test</scope>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>
@@ -532,12 +545,14 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
     </dependency>
-<!--
+    <dependency>
+      <groupId>org.verapdf</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.verapdf</groupId>
       <artifactId>validation-model</artifactId>
     </dependency>
--->
   </dependencies>
 
   <profiles>
@@ -562,5 +577,15 @@
     </profile>
   </profiles>
 
+    <repositories>
+      <repository>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
+        <id>vera-dev</id>
+        <name>Vera development</name>
+        <url>http://artifactory.openpreservation.org/artifactory/vera-dev</url>
+      </repository>
+    </repositories>
 
 </project>

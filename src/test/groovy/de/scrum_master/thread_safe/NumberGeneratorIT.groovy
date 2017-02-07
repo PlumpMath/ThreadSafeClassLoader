@@ -8,7 +8,7 @@ import org.spockframework.runtime.ConditionNotSatisfiedError
 import spock.lang.FailsWith
 import spock.lang.Specification
 
-class ThreadSafeClassLoaderIT extends Specification {
+class NumberGeneratorIT extends Specification {
   def settingsList = [
     new NumberSequenceSettings(1, 1, 10),
     new NumberSequenceSettings(0, 3, 11),
@@ -37,7 +37,7 @@ class ThreadSafeClassLoaderIT extends Specification {
   }
 
   @FailsWith(ConditionNotSatisfiedError)
-  def "Use non-thread-safe number sequence generator in a parallel stream"() {
+  def "Failure for non-thread-safe number sequence generator in a parallel stream"() {
     when:
     int[][] results = settingsList
       .parallelStream()

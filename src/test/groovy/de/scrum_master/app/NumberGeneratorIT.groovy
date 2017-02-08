@@ -1,8 +1,5 @@
-package de.scrum_master.thread_safe
+package de.scrum_master.app
 
-import de.scrum_master.app.NonThreadSafeNumberSequenceGenerator
-import de.scrum_master.app.NumberSequenceSettings
-import de.scrum_master.app.ThreadSafeNumberSequenceGenerator
 import de.scrum_master.badlib.NumberGenerator
 import org.spockframework.runtime.ConditionNotSatisfiedError
 import spock.lang.FailsWith
@@ -25,7 +22,7 @@ class NumberGeneratorIT extends Specification {
     when:
     int[][] results = settingsList
       .stream()
-      .map(new NonThreadSafeNumberSequenceGenerator())
+      .map(new ThreadUnsafeNumberSequenceGenerator())
       .toArray()
     def duration = System.currentTimeMillis() - startTime
     println "Duration sequential non-thread-safe = $duration ms"
@@ -41,7 +38,7 @@ class NumberGeneratorIT extends Specification {
     when:
     int[][] results = settingsList
       .parallelStream()
-      .map(new NonThreadSafeNumberSequenceGenerator())
+      .map(new ThreadUnsafeNumberSequenceGenerator())
       .toArray()
     def duration = System.currentTimeMillis() - startTime
     println "Duration multi-threaded non-thread-safe = $duration ms"

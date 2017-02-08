@@ -4,7 +4,7 @@ import de.scrum_master.badlib.NumberGenerator;
 
 import java.util.function.Function;
 
-public class NonThreadSafeNumberSequenceGenerator implements Function<NumberSequenceSettings, int[]> {
+public class ThreadUnsafeNumberSequenceGenerator implements Function<NumberSequenceSettings, int[]> {
   @Override
   public int[] apply(NumberSequenceSettings settings) {
     int[] numberSequence = new int[settings.getSequenceSize()];

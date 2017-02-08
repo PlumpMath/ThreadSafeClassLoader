@@ -1,7 +1,5 @@
-package de.scrum_master.thread_safe
+package de.scrum_master.app
 
-import de.scrum_master.app.VeraPDFValidator
-import org.spockframework.runtime.ConditionNotSatisfiedError
 import spock.lang.FailsWith
 import spock.lang.Specification
 import spock.lang.Unroll

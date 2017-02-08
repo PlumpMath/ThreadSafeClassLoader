@@ -1,11 +1,8 @@
-package de.scrum_master.thread_safe
+package de.scrum_master.app
 
-import de.scrum_master.app.DateGenerator
-import spock.lang.FailsWith
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.text.ParseException
 import java.text.SimpleDateFormat
 
 class DateGeneratorIT extends Specification {
